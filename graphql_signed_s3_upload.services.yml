@@ -1,0 +1,3 @@
+services:
+  graphql_signed_s3_upload.current_time:
+    class: Drupal\graphql_signed_s3_upload\SigningUtilities

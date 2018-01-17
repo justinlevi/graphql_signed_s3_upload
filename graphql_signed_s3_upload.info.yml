@@ -1,0 +1,8 @@
+name: GraphQL S3 Signed Upload Field
+type: module
+description: A GraphQL S3 Field Plugin
+core: 8.x
+package: Custom
+dependencies:
+  - graphql
+  - s3fs

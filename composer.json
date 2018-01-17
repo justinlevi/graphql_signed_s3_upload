@@ -1,0 +1,17 @@
+{
+    "name": "drupal/graphql_signed_s3_upload",
+    "description": "Adds an GraphQL Query to generate Amazon Simple Storage Service-based pre-signed upload urls.",
+    "type": "drupal-module",
+    "homepage": "https://www.drupal.org/project/graphql_signed_s3_upload",
+    "authors": [
+        {
+            "name": "Justin Winter",
+            "email": "justinlevi@gmail.com"
+        }
+    ],
+    "license": "GPL-2.0+",
+    "minimum-stability": "dev",
+    "require": {
+        "aws/aws-sdk-php": "^3.48"
+    }
+}
