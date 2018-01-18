@@ -19,12 +19,15 @@ class SigningUtilities {
   static function generateUrls(Array $filenames, S3ClientInterface $s3Client){
 
     $presignedUrls = [];
+    $bucket = \Drupal::config('s3fs.settings')->get('bucket');
 
     foreach ($filenames as $filename) {
-
-      $cmd = $s3Client->getCommand('GetObject', [
-        'Bucket' => \Drupal::config('s3fs.settings')->get('bucket'),
-        'Key' => $filename
+      
+      $cmd = $s3Client->getCommand('PutObject', [
+        'Bucket' => $bucket,
+        'Key' => $filename,
+        'ContentType' => 'image/jpeg',
+        'Body'        => '',
       ]);
 
       $request = $s3Client->createPresignedRequest($cmd, '+5 minutes');
