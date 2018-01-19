@@ -22,7 +22,7 @@ class SigningUtilities {
     $bucket = \Drupal::config('s3fs.settings')->get('bucket');
 
     foreach ($filenames as $filename) {
-      
+
       $cmd = $s3Client->getCommand('PutObject', [
         'Bucket' => $bucket,
         'Key' => $filename,
