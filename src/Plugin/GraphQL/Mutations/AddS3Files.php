@@ -14,6 +14,7 @@ use Drupal\file\Entity\File;
 use Drupal\media_entity_image\Plugin\MediaEntity\Type\Image;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\s3fs\StreamWrapper\S3fsStream;
+use Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvider;
 
 /**
  * A S3 Synchronization file mutation.
@@ -48,6 +49,13 @@ class AddS3Files extends CreateEntityBase {
    */
   protected $s3fsStream;
 
+  /**
+   * The SimpleOauthAuthenticationProvider - for getting current user.
+   *
+   * @var \Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvider
+   */
+  protected $simpleOauthAuthenticationProvider;
+
 
   /**
    * Constructs a Drupal\Component\Plugin\PluginBase object.
@@ -60,12 +68,24 @@ class AddS3Files extends CreateEntityBase {
    *   The plugin implementation definition.
    * @param EntityTypeManagerInterface $entityTypeManager
    *   The plugin implemented entityTypeManager
-   * @param \Drupal\s3fs\StreamWrapper\S3fsStream $s3fs
+   * @param \Drupal\s3fs\StreamWrapper\S3fsStream $s3fsStream
+   * @param \Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvider $simpleOauthAuthenticationProvider
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream, SimpleOauthAuthenticationProvider $simpleOauthAuthenticationProvider) {
     $this->entityTypeManager = $entityTypeManager;
     $this->currentUser = \Drupal::currentUser();
     $this->s3fsStream = $s3fsStream;
+    $this->simpleOauthAuthenticationProvider = $simpleOauthAuthenticationProvider;
+
+
+    // TODO: attempt at getting user from simple oauth module and request not working
+    //$request = $GLOBALS['request'];
+    /**
+     * @var \Drupal\simple_oauth\Authentication\TokenAuthUser
+     */
+    //$tokenAuthUser = $simpleOauthAuthenticationProvider->authenticate($request);
+    //$this->currentUser = $tokenAuthUser->id();
+
     parent::__construct($configuration, $pluginId, $pluginDefinition, $entityTypeManager);
   }
 
@@ -78,7 +98,8 @@ class AddS3Files extends CreateEntityBase {
       $pluginId,
       $pluginDefinition,
       $container->get('entity_type.manager'),
-      $container->get('stream_wrapper.s3fs')
+      $container->get('stream_wrapper.s3fs'),
+      $container->get('simple_oauth.authentication.simple_oauth')
     );
   }
 
@@ -155,9 +176,7 @@ class AddS3Files extends CreateEntityBase {
    * {@inheritdoc}
    */
   protected function extractEntityInput(array $inputArgs, InputObjectType $inputType, ResolveInfo $info) {
-
-    return [
-    ];
+    return [];
   }
 
 }
