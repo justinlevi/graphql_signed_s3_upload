@@ -11,6 +11,13 @@ query {
 }
 ```
 
+example: 
+```$xslt
+query{
+  signedUploadURL(input:{fileNames:["super.jpg", "extra.jpg"]})
+}
+```
+
 
 RESULT
 ```$xslt

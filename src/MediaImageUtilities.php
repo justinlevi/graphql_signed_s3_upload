@@ -4,10 +4,6 @@ namespace Drupal\graphql_signed_s3_upload;
 
 use Drupal\s3fs\StreamWrapper\S3fsStream;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\media\Entity\Media;
-use Drupal\media\Entity\MediaBundle;
-use Drupal\file\Entity\File;
-use Drupal\media_entity_image\Plugin\MediaEntity\Type\Image;
 use Drupal\Core\Session\AccountProxyInterface;
 
 
@@ -27,15 +23,12 @@ class MediaImageUtilities
      */
     protected $s3fsStream;
 
-
     /**
      * The entityTypeManager service.
      *
      * @var \Drupal\Core\Entity\EntityTypeManager
      */
     protected $entityTypeManager;
-
-
 
     /**
      * Constructs a MediaImageUtilities object.
@@ -58,17 +51,17 @@ class MediaImageUtilities
         return new static($entityTypeManager, $s3fsStream);
     }
 
-
     /**
      * Create File and Media Entities from S3 uploaded files - think decoupled uploader.
      *
      * @param $files
      *   An array of files.
      * @return array
+     * @throws
      */
     public function createFileAndMediaEntitiesFromS3UploadedFiles($files){
         $mediaEntities = [];
-        /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
+
         foreach ($files as $file) {
 
             $fileEntity = $this->createFileEntity($file);
@@ -81,7 +74,13 @@ class MediaImageUtilities
         return $mediaEntities;
     }
 
-
+    /**
+     * Create a file entity from an extremely optimistic url
+     *
+     * @param $file array
+     * @return \Drupal\Core\Entity\EntityInterface
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
     public function createFileEntity($file) {
 
         $uri = 'public://' . $file['url'];
@@ -117,7 +116,15 @@ class MediaImageUtilities
     }
 
 
-
+    /**
+     * Create an Image Media Entity from a file entity.
+     *
+     * @param \Drupal\file\FileInterface $fileEntity
+     *   The File entity to create the media entity from.
+     *
+     * @return \Drupal\Core\Entity\EntityInterface
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
     public function createImageMediaEntity($fileEntity){
 
         //TODO: at some point the exif data should also be loaded and added.
