@@ -84,7 +84,7 @@ class MediaImageUtilities
 
     public function createFileEntity($file) {
 
-        $uri = 'public://' . $file[0]['url'];
+        $uri = 'public://' . $file['url'];
 
         /**
          * TODO: I'd love to be able to check if the file exists on S3 first, but can't figure out how...
@@ -104,9 +104,9 @@ class MediaImageUtilities
         $fileEntity = $this->entityTypeManager->getStorage('file')->create([
             'uid' => $this->currentUser->id(),
             'status' => 0,
-            'filename' => $file[0]['filename'],
+            'filename' => $file['filename'],
             'uri' => $uri,
-            'filesize' => $file[0]['filesize'],
+            'filesize' => $file['filesize'],
             'filemime' => 'image/jpeg',
         ]);
 

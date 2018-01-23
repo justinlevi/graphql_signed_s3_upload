@@ -90,7 +90,7 @@ class AddS3Files extends CreateEntityBase {
    * {@inheritdoc}
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-      $files = $args[input];
+      $files = $args['input']['files'];
       $mediaEntities = $this->mediaImageUtilities->createFileAndMediaEntitiesFromS3UploadedFiles($files);
       return $mediaEntities;
   }
