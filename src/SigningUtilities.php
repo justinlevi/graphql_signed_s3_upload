@@ -33,7 +33,6 @@ class SigningUtilities {
         'Bucket'      => $bucket,
         'Key'         => $public_folder . '/' . $filename,
         'ContentType' => 'image/jpeg',
-        'Body'        => '',
         'ACL'         => 'public-read',
       ]);
 
