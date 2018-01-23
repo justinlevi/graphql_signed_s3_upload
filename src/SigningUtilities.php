@@ -42,9 +42,9 @@ class SigningUtilities {
     public function generateUrls(Array $filenames){
         $presignedUrls = [];
 
-        $bucket = $this->s3fsSettings->get('bucket');
-        $public_config = $this->s3fsSettings->get('public_folder');
-        $private_config = $this->s3fsSettings->get('private_folder');
+        $bucket = $this->s3fsSettings['bucket'];
+        $public_config = $this->s3fsSettings['public_folder'];
+        $private_config = $this->s3fsSettings['private_folder'];
 
         $public_folder = !empty($public_config) ? $public_config : 's3fs-public';
 
