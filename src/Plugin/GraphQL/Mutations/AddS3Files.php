@@ -117,35 +117,35 @@ class AddS3Files extends CreateEntityBase {
       // Todo: check if file exists on S3 First
       //if (file_exists($file->getPathname())) {
 
-      $uri = 'public://' . $file[0]['url'];
+        $uri = 'public://' . $file[0]['url'];
 
-      $this->s3fsStream->writeUriToCache($uri);
+        $this->s3fsStream->writeUriToCache($uri);
 
-      $entity = $this->createFile(
-        $uri,
-        $file[0]['filename'],
-        $file[0]['filesize'],
-        $this->currentUser
-      );
-      $entity->setPermanent();
-      $entity->save();
+        $entity = $this->createFile(
+          $uri,
+          $file[0]['filename'],
+          $file[0]['filesize'],
+          $this->currentUser
+        );
+        $entity->setPermanent();
+        $entity->save();
 
-      // Save media entity
-      $media = [
-        'bundle' => 'image',
-        'uid' => $this->currentUser->id(),
-        'status' => 1,
-        'image' => [
-          'target_id' => $entity->id(),
-          'alt' => t(basename($file[0]['filename'])),
-          'title' => t(basename($file[0]['filename'])),
-        ],
-      ];
-      $image = $this->entityTypeManager->getStorage('media')->create($media);
-      $image->save();
+        // Save media entity
+        $media = [
+          'bundle' => 'image',
+          'uid' => $this->currentUser->id(),
+          'status' => 1,
+          'image' => [
+            'target_id' => $entity->id(),
+            'alt' => t(basename($file[0]['filename'])),
+            'title' => t(basename($file[0]['filename'])),
+          ],
+        ];
+        $image = $this->entityTypeManager->getStorage('media')->create($media);
+        $image->save();
 
-      $media_entities[] = $image;
-      $file_entities[] = $entity;
+        $media_entities[] = $image;
+        $file_entities[] = $entity;
       //}
     }
 
