@@ -8,8 +8,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 use Drupal\graphql\GraphQL\Type\InputObjectType;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\media\Entity\Media;
-use Drupal\media\Entity\MediaBundle;
+use Drupal\graphql_signed_s3_upload\MediaImageUtilities;
 use Drupal\file\Entity\File;
 use Drupal\media_entity_image\Plugin\MediaEntity\Type\Image;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -31,24 +30,25 @@ use Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvide
  *     "input" = "S3FilesInput"
  *   }
  * )
+ *
+ * The mutation would look something like this:
+ *
+ * mutation{
+ *  addS3Files(input:{
+ *      files:[{filename:"TEST", filesize:123, url:"test.jpg"}]
+ *    }){
+ *    entityId
+ *   }
+ * }
  */
 class AddS3Files extends CreateEntityBase {
 
-
   /**
-   * Current user service.
+   * The Media Image utility service class instance.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var \Drupal\graphql_signed_s3_upload\MediaImageUtilities
    */
-  protected $currentUser;
-
-  /**
-   * The S3fs service.
-   *
-   * @var \Drupal\s3fs\StreamWrapper\S3fsStream
-   */
-  protected $s3fsStream;
-
+  protected $mediaImageUtilities;
 
 
   /**
@@ -62,12 +62,12 @@ class AddS3Files extends CreateEntityBase {
    *   The plugin implementation definition.
    * @param EntityTypeManagerInterface $entityTypeManager
    *   The plugin implemented entityTypeManager
-   * @param \Drupal\s3fs\StreamWrapper\S3fsStream $s3fsStream
+   * @param \Drupal\graphql_signed_s3_upload\MediaImageUtilities $mediaImageUtilities
+   *   The media image utility class used for creating file and media entities.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, MediaImageUtilities $mediaImageUtilities) {
     $this->entityTypeManager = $entityTypeManager;
-    $this->currentUser = \Drupal::currentUser();
-    $this->s3fsStream = $s3fsStream;
+    $this->mediaImageUtilities = $mediaImageUtilities;
 
     parent::__construct($configuration, $pluginId, $pluginDefinition, $entityTypeManager);
   }
@@ -81,7 +81,7 @@ class AddS3Files extends CreateEntityBase {
       $pluginId,
       $pluginDefinition,
       $container->get('entity_type.manager'),
-      $container->get('stream_wrapper.s3fs')
+      $container->get('graphql_signed_s3_upload.media_image_utilities')
     );
   }
 
@@ -89,68 +89,10 @@ class AddS3Files extends CreateEntityBase {
   /**
    * {@inheritdoc}
    */
-  public function createFile($uri, $filename, $filesize, AccountProxyInterface $user) {
-
-    /** @var \Drupal\file\FileInterface $file */
-    $file = $this->entityTypeManager->getStorage('file')->create([
-      'uid' => $user->id(),
-      'status' => 0,
-      'filename' => $filename,
-      'uri' => $uri,
-      'filesize' => $filesize,
-      'filemime' => 'image/jpeg',
-    ]);
-
-    return $file;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function resolve($value, array $args, ResolveInfo $info) {
-
-    $file_entities = [];
-    $media_entities = [];
-
-    /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
-    foreach ($args['input'] as $file) {
-      // Todo: check if file exists on S3 First
-      //if (file_exists($file->getPathname())) {
-
-        $uri = 'public://' . $file[0]['url'];
-
-        $this->s3fsStream->writeUriToCache($uri);
-
-        $entity = $this->createFile(
-          $uri,
-          $file[0]['filename'],
-          $file[0]['filesize'],
-          $this->currentUser
-        );
-        $entity->setPermanent();
-        $entity->save();
-
-        // Save media entity
-        $media = [
-          'bundle' => 'image',
-          'uid' => $this->currentUser->id(),
-          'status' => 1,
-          'image' => [
-            'target_id' => $entity->id(),
-            'alt' => t(basename($file[0]['filename'])),
-            'title' => t(basename($file[0]['filename'])),
-          ],
-        ];
-        $image = $this->entityTypeManager->getStorage('media')->create($media);
-        $image->save();
-
-        $media_entities[] = $image;
-        $file_entities[] = $entity;
-      //}
-    }
-
-    return $media_entities;
-
+      $files = $args[input];
+      $mediaEntities = $this->mediaImageUtilities->createFileAndMediaEntitiesFromS3UploadedFiles($files);
+      return $mediaEntities;
   }
 
 

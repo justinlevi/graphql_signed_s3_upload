@@ -30,7 +30,7 @@ class SignedUploadURL extends FieldPluginBase implements ContainerFactoryPluginI
   use DependencySerializationTrait;
 
   /**
-   * The page instance.
+   * The signing utility service class instance.
    *
    * @var \Drupal\graphql_signed_s3_upload\SigningUtilities
    */
@@ -72,7 +72,13 @@ class SignedUploadURL extends FieldPluginBase implements ContainerFactoryPluginI
       $client_config['version'] = '2006-03-01';
     }
 
-    return new static($configuration, $pluginId, $pluginDefinition, new SigningUtilities(), new S3Client($client_config));
+
+    return new static(
+        $configuration,
+        $pluginId,
+        $pluginDefinition,
+        $container->get('graphql_signed_s3_upload.signing_utilities'),
+        new S3Client($client_config));
   }
 
   /**

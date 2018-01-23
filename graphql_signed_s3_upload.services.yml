@@ -1,3 +1,6 @@
 services:
-  graphql_signed_s3_upload.current_time:
+  graphql_signed_s3_upload.signing_utilities:
     class: Drupal\graphql_signed_s3_upload\SigningUtilities
+  graphql_signed_s3_upload.media_image_utilities:
+    class: Drupal\graphql_signed_s3_upload\MediaImageUtilities
+    arguments: ['@entity_type.manager', '@stream_wrapper.s3fs']
