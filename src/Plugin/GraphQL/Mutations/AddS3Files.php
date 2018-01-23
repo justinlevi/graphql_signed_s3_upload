@@ -8,8 +8,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 use Drupal\graphql\GraphQL\Type\InputObjectType;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\media_entity\Entity\Media;
-use Drupal\media_entity\Entity\MediaBundle;
+use Drupal\media\Entity\Media;
+use Drupal\media\Entity\MediaBundle;
 use Drupal\file\Entity\File;
 use Drupal\media_entity_image\Plugin\MediaEntity\Type\Image;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -134,17 +134,17 @@ class AddS3Files extends CreateEntityBase {
         $media = [
           'bundle' => 'image',
           'uid' => $this->currentUser->id(),
-          'status' => Media::PUBLISHED,
-          'field_image' => [
+          'status' => 1,
+          'image' => [
             'target_id' => $entity->id(),
-            'alt' => t(' '),
-            'title' => t(' '),
+            'alt' => t(basename($file[0]['filename'])),
+            'title' => t(basename($file[0]['filename'])),
           ],
         ];
-        $image_media = Media::create($media);
-        $image_media->save();
+        $image = $this->entityTypeManager->getStorage('media')->create($media);
+        $image->save();
 
-        $media_entities[] = $image_media;
+        $media_entities[] = $image;
         $file_entities[] = $entity;
       //}
     }
