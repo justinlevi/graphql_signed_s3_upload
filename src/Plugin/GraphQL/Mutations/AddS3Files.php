@@ -49,12 +49,6 @@ class AddS3Files extends CreateEntityBase {
    */
   protected $s3fsStream;
 
-  /**
-   * The SimpleOauthAuthenticationProvider - for getting current user.
-   *
-   * @var \Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvider
-   */
-  protected $simpleOauthAuthenticationProvider;
 
 
   /**
@@ -69,22 +63,11 @@ class AddS3Files extends CreateEntityBase {
    * @param EntityTypeManagerInterface $entityTypeManager
    *   The plugin implemented entityTypeManager
    * @param \Drupal\s3fs\StreamWrapper\S3fsStream $s3fsStream
-   * @param \Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvider $simpleOauthAuthenticationProvider
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream, SimpleOauthAuthenticationProvider $simpleOauthAuthenticationProvider) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream) {
     $this->entityTypeManager = $entityTypeManager;
     $this->currentUser = \Drupal::currentUser();
     $this->s3fsStream = $s3fsStream;
-    $this->simpleOauthAuthenticationProvider = $simpleOauthAuthenticationProvider;
-
-
-    // TODO: attempt at getting user from simple oauth module and request not working
-    //$request = $GLOBALS['request'];
-    /**
-     * @var \Drupal\simple_oauth\Authentication\TokenAuthUser
-     */
-    //$tokenAuthUser = $simpleOauthAuthenticationProvider->authenticate($request);
-    //$this->currentUser = $tokenAuthUser->id();
 
     parent::__construct($configuration, $pluginId, $pluginDefinition, $entityTypeManager);
   }
@@ -98,8 +81,7 @@ class AddS3Files extends CreateEntityBase {
       $pluginId,
       $pluginDefinition,
       $container->get('entity_type.manager'),
-      $container->get('stream_wrapper.s3fs'),
-      $container->get('simple_oauth.authentication.simple_oauth')
+      $container->get('stream_wrapper.s3fs')
     );
   }
 
@@ -143,7 +125,7 @@ class AddS3Files extends CreateEntityBase {
           $uri,
           $file[0]['filename'],
           $file[0]['filesize'],
-          \Drupal::currentUser()
+          $this->currentUser
         );
         $entity->setPermanent();
         $entity->save();
