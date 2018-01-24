@@ -2,18 +2,17 @@
 
 namespace Drupal\graphql_signed_s3_upload\Plugin\GraphQL\Mutations;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Drupal\graphql\GraphQL\Type\InputObjectType;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\graphql_signed_s3_upload\MediaImageUtilities;
-use Drupal\file\Entity\File;
-use Drupal\media_entity_image\Plugin\MediaEntity\Type\Image;
+use Drupal\graphql_signed_s3_upload\CreateMediaImageEntityManager;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\file\Entity\File;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Drupal\media_entity_image\Plugin\MediaEntity\Type\Image;
 use Drupal\s3fs\StreamWrapper\S3fsStream;
-use Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvider;
 
 /**
  * A S3 Synchronization file mutation.
@@ -46,7 +45,7 @@ class AddS3Files extends CreateEntityBase {
   /**
    * The Media Image utility service class instance.
    *
-   * @var \Drupal\graphql_signed_s3_upload\MediaImageUtilities
+   * @var \Drupal\graphql_signed_s3_upload\CreateMediaImageEntityManager
    */
   protected $mediaImageUtilities;
 
@@ -62,10 +61,10 @@ class AddS3Files extends CreateEntityBase {
    *   The plugin implementation definition.
    * @param EntityTypeManagerInterface $entityTypeManager
    *   The plugin implemented entityTypeManager
-   * @param \Drupal\graphql_signed_s3_upload\MediaImageUtilities $mediaImageUtilities
+   * @param \Drupal\graphql_signed_s3_upload\CreateMediaImageEntityManager $mediaImageUtilities
    *   The media image utility class used for creating file and media entities.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, MediaImageUtilities $mediaImageUtilities) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, CreateMediaImageEntityManager $mediaImageUtilities) {
     $this->entityTypeManager = $entityTypeManager;
     $this->mediaImageUtilities = $mediaImageUtilities;
 
@@ -81,7 +80,7 @@ class AddS3Files extends CreateEntityBase {
       $pluginId,
       $pluginDefinition,
       $container->get('entity_type.manager'),
-      $container->get('graphql_signed_s3_upload.media_image_utilities')
+      $container->get('graphql_signed_s3_upload.create_media_image_entity_manager')
     );
   }
 
