@@ -2,10 +2,11 @@
 
 namespace Drupal\graphql_signed_s3_upload;
 
-use \Aws\S3\S3ClientInterface;
 use \Aws\S3\S3Client;
+use Drupal\Core\Config\ConfigFactoryInterface;
 
-class SigningUtilities {
+
+class SignedUploadURLManager {
 
     /**
      * The AWS SDK for PHP S3Client object.
@@ -15,19 +16,26 @@ class SigningUtilities {
     protected $s3Client = NULL;
 
     /**
-     *
+     * @var \Drupal\Core\Config\ImmutableConfig $s3fsConfig
      */
-    protected $s3fsSettings = NULL;
+    protected $s3fsConfig = NULL;
 
     /**
-     * Constructs a MediaImageUtilities object.
+     * Constructs a SigningUtility object.
      *
-     * @param \Aws\S3\S3ClientInterface $s3client
+     * @param ConfigFactoryInterface $configFactory
      *   The s3 Client.
      */
-    public function __construct() {
-        $this->s3fsSettings = $config = \Drupal::config('s3fs.settings')->get();
-        $this->s3Client = new S3Client($this->getClientConfig());
+    public function __construct($configFactory) {
+        $this->s3fsConfig = $configFactory->get('s3fs.settings');
+        $this->s3Client = new S3Client($this->getClientConfig($this->s3fsConfig));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function create($configFactory) {
+        return new static($configFactory);
     }
 
     /**
@@ -42,9 +50,9 @@ class SigningUtilities {
     public function generateUrls(Array $filenames){
         $presignedUrls = [];
 
-        $bucket = $this->s3fsSettings['bucket'];
-        $public_config = $this->s3fsSettings['public_folder'];
-        $private_config = $this->s3fsSettings['private_folder'];
+        $bucket = $this->s3fsConfig->get('bucket');
+        $public_config = $this->s3fsConfig->get('public_folder');
+        $private_config = $this->s3fsConfig->get('private_folder');
 
         $public_folder = !empty($public_config) ? $public_config : 's3fs-public';
 
@@ -70,17 +78,20 @@ class SigningUtilities {
     /**
      * Returns the S3fs S3 configuration
      *
+     * @param array $s3fsConfig
+     *   The container.
+     *
      * @return array
      */
-    protected function getClientConfig(){
+    public static function getClientConfig($s3fsConfig){
 
         $clientConfig['credentials'] = [
-            'key' => $this->s3fsSettings['access_key'],
-            'secret' => $this->s3fsSettings['secret_key'],
+            'key' => $s3fsConfig->get('access_key'),
+            'secret' => $s3fsConfig->get('secret_key'),
         ];
 
-        if (!empty($this->s3fsSettings['region'])) {
-            $clientConfig['region'] = $this->s3fsSettings['region'];
+        if (!empty($s3fsConfig->get('region'))) {
+            $clientConfig['region'] = $s3fsConfig->get('region');
             // Signature v4 is only required in the Beijing and Frankfurt regions.
             // Also, setting it will throw an exception if a region hasn't been set.
             $clientConfig['signature_version'] = 'v4';
@@ -88,4 +99,5 @@ class SigningUtilities {
         }
         return $clientConfig;
     }
+
 }

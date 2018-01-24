@@ -2,12 +2,12 @@
 
 namespace Drupal\graphql_signed_s3_upload;
 
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\s3fs\StreamWrapper\S3fsStream;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Session\AccountProxyInterface;
 
 
-class MediaImageUtilities
+class CreateMediaImageEntityManager
 {
     /**
      * Current user service.
@@ -35,20 +35,21 @@ class MediaImageUtilities
      *
      * @param EntityTypeManagerInterface $entityTypeManager
      *   The plugin implemented entityTypeManager
-     * @param S3fsStream $entityTypeManager
-     *   The plugin implemented entityTypeManager
+     * @param S3fsStream $s3fsStream
+     *   The S3fsStream object used for syncing
+     * @param AccountProxyInterface $currentUser
      */
-    public function __construct(EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream) {
+    public function __construct(EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream, AccountProxyInterface $currentUser) {
         $this->entityTypeManager = $entityTypeManager;
-        $this->currentUser = \Drupal::currentUser();
+        $this->currentUser = $currentUser;
         $this->s3fsStream = $s3fsStream;
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function create(EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream) {
-        return new static($entityTypeManager, $s3fsStream);
+    public static function create(EntityTypeManagerInterface $entityTypeManager, S3fsStream $s3fsStream, AccountProxyInterface $currentUser) {
+        return new static($entityTypeManager, $s3fsStream, $currentUser);
     }
 
     /**
@@ -114,7 +115,6 @@ class MediaImageUtilities
 
         return $fileEntity;
     }
-
 
     /**
      * Create an Image Media Entity from a file entity.
