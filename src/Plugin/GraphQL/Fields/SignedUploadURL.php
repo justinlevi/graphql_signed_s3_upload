@@ -5,8 +5,7 @@ namespace Drupal\graphql_signed_s3_upload\Plugin\GraphQL\Fields;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\graphql_signed_s3_upload\SigningUtilities;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql_signed_s3_upload\SignedUploadURLManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -26,49 +25,53 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * )
  */
 class SignedUploadURL extends FieldPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
+    use DependencySerializationTrait;
 
-  /**
-   * The page instance.
-   *
-   * @var \Drupal\graphql_signed_s3_upload\SigningUtilities
-   */
-  protected $signingUtilities;
+    /**
+     * The page instance.
+     *
+     * @var \Drupal\graphql_signed_s3_upload\SignedUploadURLManager
+     */
+    protected $signedUploadURLManager;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    $result = $this->signingUtilities->generateUrls($args['input']['fileNames']);
-    foreach ($result as $signedUrl) {
-      yield $signedUrl;
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveValues($value, array $args, ResolveInfo $info) {
+        $result = $this->signedUploadURLManager->generateUrls($args['input']['fileNames']);
+        foreach ($result as $signedUrl) {
+            yield $signedUrl;
+        }
     }
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static(
-        $configuration,
-        $pluginId,
-        $pluginDefinition,
-        $container->get('graphql_signed_s3_upload.signing_utilities')
+    /**
+     * {@inheritdoc}
+     */
+    public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+
+        /** @var \Drupal\graphql_signed_s3_upload\SignedUploadURLManager $signedUploadURLManager */
+        $signedUploadURLManager = $container->get('graphql_signed_s3_upload.signed_upload_url_manager');
+
+        return new static(
+            $configuration,
+            $pluginId,
+            $pluginDefinition,
+            $signedUploadURLManager
         );
-  }
+    }
 
-  /**
-   * Constructs a Drupal\Component\Plugin\PluginBase object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param $pluginId
-   * @param $pluginDefinition
-   * @param \Drupal\graphql_signed_s3_upload\SigningUtilities $signingUtilities
-   */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, SigningUtilities $signingUtilities) {
-    $this->signingUtilities = $signingUtilities;
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
-  }
+    /**
+     * Constructs a Drupal\Component\Plugin\PluginBase object.
+     *
+     * @param array $configuration
+     *   A configuration array containing information about the plugin instance.
+     * @param $pluginId
+     * @param $pluginDefinition
+     * @param \Drupal\graphql_signed_s3_upload\SignedUploadURLManager $signedUploadURLManager
+     */
+    public function __construct(array $configuration, $pluginId, $pluginDefinition, $signedUploadURLManager) {
+        $this->signedUploadURLManager = $signedUploadURLManager;
+        parent::__construct($configuration, $pluginId, $pluginDefinition);
+    }
 
 }

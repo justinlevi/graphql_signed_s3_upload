@@ -1,6 +1,8 @@
 services:
-  graphql_signed_s3_upload.signing_utilities:
-    class: Drupal\graphql_signed_s3_upload\SigningUtilities
-  graphql_signed_s3_upload.media_image_utilities:
-    class: Drupal\graphql_signed_s3_upload\MediaImageUtilities
-    arguments: ['@entity_type.manager', '@stream_wrapper.s3fs']
+  graphql_signed_s3_upload.signed_upload_url_manager:
+    class: Drupal\graphql_signed_s3_upload\SignedUploadURLManager
+    arguments: ['@config.factory']
+
+  graphql_signed_s3_upload.create_media_image_entity_manager:
+    class: Drupal\graphql_signed_s3_upload\CreateMediaImageEntityManager
+    arguments: ['@entity_type.manager', '@stream_wrapper.s3fs', '@current_user']
