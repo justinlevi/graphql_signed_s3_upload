@@ -98,7 +98,7 @@ class AddS3Files extends CreateEntityBase {
   /**
    * {@inheritdoc}
    */
-  protected function extractEntityInput(array $inputArgs, InputObjectType $inputType, ResolveInfo $info) {
+  protected function extractEntityInput(array $inputArgs, ResolveInfo $info) {
     return [];
   }
 
