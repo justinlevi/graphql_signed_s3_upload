@@ -6,8 +6,9 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql_signed_s3_upload\SignedUploadURLManager;
+use GraphQL\Type\Definition\ResolveInfo;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * List everything we've got in our page.
@@ -37,7 +38,7 @@ class SignedUploadURL extends FieldPluginBase implements ContainerFactoryPluginI
     /**
      * {@inheritdoc}
      */
-    public function resolveValues($value, array $args, ResolveInfo $info) {
+    public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
         $result = $this->signedUploadURLManager->generateUrls($args['input']['fileNames']);
         foreach ($result as $signedUrl) {
             yield $signedUrl;

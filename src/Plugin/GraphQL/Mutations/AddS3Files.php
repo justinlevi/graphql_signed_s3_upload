@@ -3,8 +3,8 @@
 namespace Drupal\graphql_signed_s3_upload\Plugin\GraphQL\Mutations;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
-use Drupal\graphql\GraphQL\Type\InputObjectType;
+use GraphQL\Type\Definition\ResolveInfo;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\graphql_signed_s3_upload\CreateMediaImageEntityManager;
@@ -88,7 +88,7 @@ class AddS3Files extends CreateEntityBase {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
       $files = $args['input']['files'];
       $mediaEntities = $this->mediaImageUtilities->createFileAndMediaEntitiesFromS3UploadedFiles($files);
       return $mediaEntities;
@@ -98,7 +98,7 @@ class AddS3Files extends CreateEntityBase {
   /**
    * {@inheritdoc}
    */
-  protected function extractEntityInput(array $inputArgs, ResolveInfo $info) {
+  protected function extractEntityInput($value, array $args, ResolveContext $context, ResolveInfo $info) {
     return [];
   }
 
