@@ -1,0 +1,13 @@
+mutation($input: ArticleInput){
+  addS3Files(input:$input) {
+    mid
+      ... on MediaImage {
+        images:fieldMediaImage{
+          derivative(style:MEDIUM) {
+            url
+          }
+        }
+      }
+    }
+  }
+}
