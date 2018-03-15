@@ -132,7 +132,7 @@ class CreateMediaImageEntityManager
 
         // Save media entity
         $imageMediaEntity = $this->entityTypeManager->getStorage('media')->create([
-            'bundle' => 'media_image',
+            'bundle' => 'image',
             'uid' => $this->currentUser->id(),
             'status' => 1,
             'image' => [

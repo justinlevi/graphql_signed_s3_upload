@@ -16,7 +16,7 @@ use Drupal\graphql_signed_s3_upload\CreateMediaImageEntityManager;
  *   id = "add_s3_files",
  *   secure = "false",
  *   name = "addS3Files",
- *   type = "MediaMediaImage",
+ *   type = "MediaImage",
  *   multi = true,
  *   entity_type = "file",
  *   entity_bundle = "file",
