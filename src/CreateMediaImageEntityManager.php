@@ -135,7 +135,7 @@ class CreateMediaImageEntityManager
             'bundle' => 'image',
             'uid' => $this->currentUser->id(),
             'status' => 1,
-            'image' => [
+            'field_media_image' => [
                 'target_id' => $fileEntity->id()
             ]
         ]);
