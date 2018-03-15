@@ -8,11 +8,6 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\graphql_signed_s3_upload\CreateMediaImageEntityManager;
-use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\file\Entity\File;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Drupal\media_entity_image\Plugin\MediaEntity\Type\Image;
-use Drupal\s3fs\StreamWrapper\S3fsStream;
 
 /**
  * A S3 Synchronization file mutation.
@@ -21,7 +16,7 @@ use Drupal\s3fs\StreamWrapper\S3fsStream;
  *   id = "add_s3_files",
  *   secure = "false",
  *   name = "addS3Files",
- *   type = "MediaImage",
+ *   type = "MediaMediaImage",
  *   multi = true,
  *   entity_type = "file",
  *   entity_bundle = "file",
